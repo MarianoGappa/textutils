@@ -1,3 +1,24 @@
 #!/bin/bash
 
-LC_CTYPE=C && LANG=C && tr ' ' '\n' | sed 's/[^a-zA-ZáéíóúÁÉÍÓÚñÑ]//g' | sort | uniq
+function freq {
+    LC_CTYPE=C &&
+    LANG=C &&
+    tr '[:upper:]' '[:lower:]' |
+    tr ' ' '\n' |
+    sed 's/[^a-zA-ZáéíóúÁÉÍÓÚñÑ]//g' |
+    sort |
+    uniq -c |
+    sort -nr |
+    awk '{print $2,$1}'
+}
+
+function uniques {
+    LC_CTYPE=C &&
+    LANG=C &&
+    tr ' ' '\n' |
+    tr '[:upper:]' '[:lower:]' |
+    sed 's/[^a-zA-ZáéíóúÁÉÍÓÚñÑ]//g' |
+    sort |
+    uniq
+}
+
