@@ -29,7 +29,7 @@ function diff1 {
     cat "$1" | uniques > "$TMP_FILE_1"
     cat "$2" | uniques > "$TMP_FILE_2"
 
-    diff --suppress-common-lines "$TMP_FILE_1" "$TMP_FILE_2"
+    ./textutils diff "$TMP_FILE_1" "$TMP_FILE_2"
 
     rm $TMP_FILE_1
     rm $TMP_FILE_2
