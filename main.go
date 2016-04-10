@@ -8,7 +8,7 @@ import (
 	"strings"
 )
 
-func readLines(path string) (map[string]int, error) {
+func readWords(path string) (map[string]int, error) {
 	file, err := os.Open(path)
 	if err != nil {
 		return nil, err
@@ -20,6 +20,28 @@ func readLines(path string) (map[string]int, error) {
 	for scanner.Scan() {
 		line := scanner.Text()
 		lineWords := strings.Fields(line)
+		for _, v := range lineWords {
+			if filtered := filterChars(v); len(filtered) > 0 {
+				words[filtered]++
+			}
+		}
+	}
+	return words, scanner.Err()
+}
+
+func readDict(path string) (map[string]int, error) {
+	file, err := os.Open(path)
+	if err != nil {
+		return nil, err
+	}
+	defer file.Close()
+
+	words := make(map[string]int)
+	scanner := bufio.NewScanner(file)
+	for scanner.Scan() {
+		line := scanner.Text()
+		section := strings.Split(line, "===")
+		lineWords := strings.Split(section[1], ";")
 		for _, v := range lineWords {
 			if filtered := filterChars(v); len(filtered) > 0 {
 				words[filtered]++
@@ -60,9 +82,18 @@ func filterChars(s string) string {
 	return result
 }
 
-func diff(lines1 map[string]int, lines2 map[string]int) {
-	for k := range lines1 {
-		if _, ok := lines2[k]; !ok {
+func diff(words1 map[string]int, words2 map[string]int) {
+	for k := range words1 {
+		if _, ok := words2[k]; !ok {
+			fmt.Println(k)
+		}
+	}
+	return
+}
+
+func intersect(words1 map[string]int, words2 map[string]int) {
+	for k := range words1 {
+		if _, ok := words2[k]; ok {
 			fmt.Println(k)
 		}
 	}
@@ -75,15 +106,30 @@ func main() {
 
 	switch args[0] {
 	case "freq":
-		lines, _ := readLines(args[1])
+		lines, _ := readWords(args[1])
 		for k, v := range lines {
 			fmt.Println(k, v)
 		}
 	case "diff":
-		lines1, _ := readLines(args[1])
-		lines2, _ := readLines(args[2])
+		words1, _ := readWords(args[1])
+		words2, _ := readWords(args[2])
 
-		diff(lines1, lines2)
+		diff(words1, words2)
+	case "adjectives":
+		words1, _ := readWords(args[1])
+		words2, _ := readDict("dictionaries/adjDic.txt")
+
+		intersect(words1, words2)
+	case "nouns":
+		words1, _ := readWords(args[1])
+		words2, _ := readDict("dictionaries/nounDic.txt")
+
+		intersect(words1, words2)
+	case "verbs":
+		words1, _ := readWords(args[1])
+		words2, _ := readDict("dictionaries/verbDic.txt")
+
+		intersect(words1, words2)
 	}
 
 }
